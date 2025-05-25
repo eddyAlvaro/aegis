@@ -1,8 +1,8 @@
-import { User } from '../../users/domain/user';
+import { UserEntity } from '@src/modules/users-management/infraestructure/persistence/relational/entity/user.entity';
 
 export class Session {
-  id: number | string;
-  user: User;
+  id: string;
+  user: UserEntity;
   hash: string;
   createdAt: Date;
   updatedAt: Date;

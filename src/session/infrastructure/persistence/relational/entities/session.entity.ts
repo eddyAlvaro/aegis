@@ -7,17 +7,18 @@ import {
   DeleteDateColumn,
   Column,
   UpdateDateColumn,
+  PrimaryColumn,
 } from 'typeorm';
-import { UserEntity } from '../../../../../users/infrastructure/persistence/relational/entities/user.entity';
 
 import { EntityRelationalHelper } from '../../../../../utils/relational-entity-helper';
+import { UserEntity } from '@src/modules/users-management/infraestructure/persistence/relational/entity/user.entity';
 
 @Entity({
   name: 'session',
 })
 export class SessionEntity extends EntityRelationalHelper {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryColumn('uuid')
+  id: string;
 
   @ManyToOne(() => UserEntity, {
     eager: true,
