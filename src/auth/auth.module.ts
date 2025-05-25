@@ -1,6 +1,4 @@
 import { Module } from '@nestjs/common';
-import { AuthController } from './auth.controller';
-import { AuthService } from './auth.service';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './strategies/jwt.strategy';
@@ -9,17 +7,23 @@ import { JwtRefreshStrategy } from './strategies/jwt-refresh.strategy';
 import { MailModule } from '../mail/mail.module';
 import { SessionModule } from '../session/session.module';
 import { UsersModule } from '../users/users.module';
+import { IamModule } from '../iam/iam.module';
+import { AccessControlModule, RolesBuilder } from 'nest-access-control';
+import { RelationalRolePersistenceModule } from '../iam/infrastructure/persistence/relational/relational-persistence.module';
 
 @Module({
   imports: [
     UsersModule,
+    IamModule,
     SessionModule,
     PassportModule,
     MailModule,
     JwtModule.register({}),
+    AccessControlModule.forRoles(new RolesBuilder()),
+    RelationalRolePersistenceModule,
   ],
-  controllers: [AuthController],
-  providers: [AuthService, JwtStrategy, JwtRefreshStrategy, AnonymousStrategy],
-  exports: [AuthService],
+  controllers: [],
+  providers: [JwtStrategy, JwtRefreshStrategy, AnonymousStrategy],
+  exports: [],
 })
 export class AuthModule {}
