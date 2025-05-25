@@ -3,75 +3,98 @@ import { InjectRepository } from '@nestjs/typeorm';
 
 import { Repository } from 'typeorm';
 import bcrypt from 'bcryptjs';
-import { RoleEnum } from '../../../../roles/roles.enum';
-import { StatusEnum } from '../../../../statuses/statuses.enum';
+import { RoleEntity } from '../../../../iam/infrastructure/persistence/relational/entities/role.entity';
+import { UserEntity } from '../../../../modules/users-management/infraestructure/persistence/relational/entity/user.entity';
+import { randomUUID } from 'crypto';
+// import { DocumentType } from '../../../../modules/organization-management/domain/types/document-type.enum';
+import { UserType } from '../../../../modules/users-management/domain/types/user-type';
+// import { OrganizationEntity } from '../../../../modules/organization-management/infrastructure/persistence/relational/entities/organization.entity';
+import { UserStatus } from '../../../../modules/users-management/domain/types/user-status';
+import { SystemRole } from '@src/iam/domain/system-role';
 
 @Injectable()
 export class UserSeedService {
   constructor(
     @InjectRepository(UserEntity)
-    private repository: Repository<UserEntity>,
+    private typeOrmUserRepository: Repository<UserEntity>,
+    @InjectRepository(RoleEntity)
+    private typeOrmRoleRepository: Repository<RoleEntity>,
+    // @InjectRepository(OrganizationEntity)
+    // private typeOrmOrganizationRepository: Repository<OrganizationEntity>,
   ) {}
 
-  async run() {
-    const countAdmin = await this.repository.count({
+  async createUser(props: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    password: string;
+    type: UserType;
+    role: string;
+  }) {
+    const count = await this.typeOrmUserRepository.count({
       where: {
-        role: {
-          id: RoleEnum.admin,
-        },
+        email: props.email,
       },
     });
 
-    if (!countAdmin) {
-      const salt = await bcrypt.genSalt();
-      const password = await bcrypt.hash('secret', salt);
+    const americo = await this.typeOrmUserRepository.findOne({
+      where: {
+        email: 'ajac.110894@gmail.com',
+      },
+    });
+    if (americo) {
+      americo.firstName = 'Americo';
+      americo.lastName = 'Albuquerque';
+      americo.generateCommonName();
+      await this.typeOrmUserRepository.save(americo);
+    }
 
-      await this.repository.save(
-        this.repository.create({
-          firstName: 'Super',
-          lastName: 'Admin',
-          email: 'admin@developer.com',
-          password,
-          role: {
-            id: RoleEnum.admin,
-            name: 'Admin',
-          },
-          status: {
-            id: StatusEnum.active,
-            name: 'Active',
-          },
+    const jose = await this.typeOrmUserRepository.findOne({
+      where: {
+        email: 'accesocred.prueba01@gmail.com',
+      },
+    });
+    if (jose) {
+      jose.firstName = 'Jose';
+      jose.lastName = 'Barrios';
+      jose.generateCommonName();
+      await this.typeOrmUserRepository.save(jose);
+    }
+
+    if (!count) {
+      const salt = await bcrypt.genSalt();
+      const cryptPassword = await bcrypt.hash(props.password, salt);
+
+      await this.typeOrmUserRepository.save(
+        this.typeOrmUserRepository.create({
+          id: randomUUID(),
+          firstName: props.firstName,
+          lastName: props.lastName,
+          // documentType: DocumentType.Dni,
+          documentIdentifier: '87382992',
+          // phoneCountryCode: 'PE',
+          phoneNumber: '879675566',
+          status: UserStatus.Active,
+          roles: [this.typeOrmRoleRepository.create({ id: props.role })],
+          type: props.type,
+          email: props.email,
+          password: cryptPassword,
         }),
       );
     }
+  }
 
-    const countUser = await this.repository.count({
-      where: {
-        role: {
-          id: RoleEnum.user,
-        },
-      },
-    });
-
-    if (!countUser) {
-      const salt = await bcrypt.genSalt();
-      const password = await bcrypt.hash('secret', salt);
-
-      await this.repository.save(
-        this.repository.create({
-          firstName: 'John',
-          lastName: 'Doe',
-          email: 'john.doe@example.com',
-          password,
-          role: {
-            id: RoleEnum.user,
-            name: 'Admin',
-          },
-          status: {
-            id: StatusEnum.active,
-            name: 'Active',
-          },
-        }),
-      );
+  async run() {
+    const usersCount = await this.typeOrmUserRepository.count();
+    if (usersCount === 0) {
+      await this.createUser({
+        firstName: 'Marcos',
+        lastName: 'Claros',
+        email: 'admin@acceso.com.pe',
+        password: 'Acceso123@@',
+        type: UserType.SuperAdmin,
+        role: SystemRole.SuperAdmin,
+      });
     }
   }
 }

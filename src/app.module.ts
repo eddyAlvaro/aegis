@@ -17,7 +17,9 @@ import { DataSource, DataSourceOptions } from 'typeorm';
 import { AllConfigType } from './config/config.type';
 import { SessionModule } from './session/session.module';
 import { MailerModule } from './mailer/mailer.module';
-import { UsersManagementModule } from './modules/users-management/users.management.module';
+import { UsersManagementModule } from './modules/users-management/users-management.module';
+import { EventEmitterModule } from '@nestjs/event-emitter';
+import { DrivingModule } from './modules/driving/landing.module';
 
 const infrastructureDatabaseModule = TypeOrmModule.forRootAsync({
   useClass: TypeOrmConfigService,
@@ -28,6 +30,9 @@ const infrastructureDatabaseModule = TypeOrmModule.forRootAsync({
 
 @Module({
   imports: [
+    EventEmitterModule.forRoot({
+      global: true,
+    }),
     ConfigModule.forRoot({
       isGlobal: true,
       load: [databaseConfig, authConfig, appConfig, mailConfig, fileConfig],
@@ -64,6 +69,7 @@ const infrastructureDatabaseModule = TypeOrmModule.forRootAsync({
     MailerModule,
     HomeModule,
     UsersManagementModule,
+    DrivingModule,
   ],
 })
 export class AppModule {}
