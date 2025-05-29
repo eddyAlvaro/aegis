@@ -17,7 +17,7 @@ import { RoleEntity } from '../../../../../../iam/infrastructure/persistence/rel
 import { UserType } from '../../../../domain/types/user-type';
 import { SimpleDomainFailure } from '../../../../../shared-kernel/domain/failures/shared-kernel.failures';
 import { UserStatus } from '../../../../domain/types/user-status';
-import { DrivingTrainingRecordEntity } from '../../../../../driving/infraestructure/persistence/relational/entity/driving-training-record.entity';
+import { EnrollmentRecordEntity } from './enrollment-record.entity';
 
 @Entity()
 export class UserEntity extends EntityRelationalHelper {
@@ -53,8 +53,12 @@ export class UserEntity extends EntityRelationalHelper {
   @Column({ type: 'varchar', length: 50, nullable: true })
   currentLicense: 'A-I' | 'A-IIb';
 
+  // todo tabla category
   @Column({ type: 'varchar', length: 50, nullable: true })
   desiredLicense: 'A-I' | 'A-IIb';
+
+  // @Column({ type: 'varchar', length: 50, nullable: true })
+  // matricula: string;
 
   @Column({ type: 'varchar', length: 50, nullable: true })
   procedureType: 'RECATEGOROZACION' | 'TRANSFERENCIA';
@@ -181,10 +185,15 @@ export class UserEntity extends EntityRelationalHelper {
   suspensionReason: string | null;
 
   @OneToMany(
-    () => DrivingTrainingRecordEntity,
-    (driving) => driving.participant,
+    () => EnrollmentRecordEntity,
+    (enrollment) => enrollment.enrolledUser,
   )
-  drivingTrainingRecords: DrivingTrainingRecordEntity[];
+  enrollmentRecords: EnrollmentRecordEntity[];
+  // @OneToMany(
+  //   () => DrivingTrainingRecordEntity,
+  //   (driving) => driving.participant,
+  // )
+  // drivingTrainingRecords: DrivingTrainingRecordEntity[];
 
   generateCommonName() {
     let commonName = '';

@@ -18,7 +18,7 @@ import {
 import { MailService } from '../../../../mail/mail.service';
 import { EmailAlreadyUsed } from '@src/users/domain/failures/user.failures';
 import { RegisterEnrollmentDto } from './dtos/register-enrollment.dto';
-import { DrivingTrainingRecordEntity } from '../../../driving/infraestructure/persistence/relational/entity/driving-training-record.entity';
+import { DrivingTrainingRecordEntity } from '../../../driving-management/infraestructure/persistence/relational/entity/practice-register/driving-training-record.entity';
 
 @ApiTags(routesV1.authManagement.root)
 @Controller(routesV1.version)
@@ -84,15 +84,15 @@ export class RegisterEnrollmentHttpController {
     newUser.generateCommonName();
     await this.typeOrmUserRepository.save(newUser);
 
-    const newDrivingTrainingRecord =
-      this.typeOrmDrivingTrainingRecordRepository.create({
-        id: randomUUID(),
-        participant: newUser,
-      });
+    // const newDrivingTrainingRecord =
+    //   this.typeOrmDrivingTrainingRecordRepository.create({
+    //     id: randomUUID(),
+    //     participant: newUser,
+    //   });
 
-    await this.typeOrmDrivingTrainingRecordRepository.save(
-      newDrivingTrainingRecord,
-    );
+    // await this.typeOrmDrivingTrainingRecordRepository.save(
+    //   newDrivingTrainingRecord,
+    // );
 
     //todo send email
     // const command = new SendForgotPasswordCommand({

@@ -6,6 +6,7 @@
 // Root
 const authManagement = 'auth-management';
 const roleConfiguration = 'role-configuration';
+const userManagement = 'user-management';
 
 const sharedKernel = 'shared-kernel';
 // SubRoots
@@ -48,6 +49,10 @@ export const routesV1 = {
     generateDrivingTrainingRecord: `/${driving}/create-driving-training-record`,
   },
 
+  usersManagement: {
+    root: userManagement,
+    findParticipantsPaginated: `/${userManagement}/find-participants-paginated`,
+  },
   authManagement: {
     root: authManagement,
     loginUser: `/${authManagement}/login-user`,

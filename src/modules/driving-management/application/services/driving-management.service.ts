@@ -3,10 +3,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CommentsDto } from '../dtos/driving-training-record.dto';
 import { randomUUID } from 'crypto';
-import { DrivingTrainingRecordEntity } from '../../infraestructure/persistence/relational/entity/driving-training-record.entity';
 import { MailService } from '../../../../mail/mail.service';
-import { DrivingTrainingDailyLogEntity } from '../../infraestructure/persistence/relational/entity/driving-training-daily-log.entity';
 import { UserEntity } from '../../../users-management/infraestructure/persistence/relational/entity/user.entity';
+import { DrivingTrainingRecordEntity } from '../../infraestructure/persistence/relational/entity/practice-register/driving-training-record.entity';
 
 @Injectable()
 export class DrivingManagementService {

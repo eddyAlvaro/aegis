@@ -3,7 +3,6 @@ import { RelationalUserPersistenceModule } from './infraestructure/persistence/r
 import { UserEntity } from './infraestructure/persistence/relational/entity/user.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { RegisterEnrollmentHttpController } from './presentation/register-participant/register-enrollment.http.controller';
-import { DrivingModule } from '../driving/landing.module';
 
 @Module({
   imports: [RelationalUserPersistenceModule],
