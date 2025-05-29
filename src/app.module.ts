@@ -19,7 +19,7 @@ import { SessionModule } from './session/session.module';
 import { MailerModule } from './mailer/mailer.module';
 import { UsersManagementModule } from './modules/users-management/users-management.module';
 import { EventEmitterModule } from '@nestjs/event-emitter';
-import { DrivingModule } from './modules/driving/landing.module';
+import { DrivingModule } from './modules/driving-management/driving.module';
 
 const infrastructureDatabaseModule = TypeOrmModule.forRootAsync({
   useClass: TypeOrmConfigService,
