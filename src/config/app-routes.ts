@@ -7,7 +7,7 @@
 const authManagement = 'auth-management';
 const roleConfiguration = 'role-configuration';
 const userManagement = 'user-management';
-
+const enrollmentManagement = 'enrollment-management';
 const sharedKernel = 'shared-kernel';
 // SubRoots
 const car = 'car';
@@ -47,6 +47,14 @@ export const routesV1 = {
   driving: {
     root: driving,
     generateDrivingTrainingRecord: `/${driving}/create-driving-training-record`,
+    courses: `/${driving}/courses`,
+    licenceCategory: `/${driving}/licence-category`,
+  },
+
+  enrollmentManagement: {
+    root: enrollmentManagement,
+    registerStudent: `/${enrollmentManagement}/register-student`,
+    updateEnrollmentForStudent: `/${enrollmentManagement}/update-enrollment-for-student`,
   },
 
   usersManagement: {

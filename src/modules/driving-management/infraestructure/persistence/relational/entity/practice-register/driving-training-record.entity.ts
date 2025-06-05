@@ -8,7 +8,7 @@ import {
   PrimaryColumn,
 } from 'typeorm';
 import { DrivingTrainingDailyLogEntity } from './driving-training-daily-log.entity';
-import { EnrollmentRecordEntity } from '../../../../../../users-management/infraestructure/persistence/relational/entity/enrollment-record.entity';
+import { EnrollmentRecordEntity } from '../../../../../../enrollment-management/infraestructure/persistence/relational/entity/enrollment-record.entity';
 
 @Entity()
 export class DrivingTrainingRecordEntity {

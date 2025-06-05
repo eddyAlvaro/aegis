@@ -3,13 +3,14 @@ import {
   Column,
   Entity,
   JoinColumn,
+  JoinTable,
   ManyToMany,
   ManyToOne,
   OneToMany,
   PrimaryColumn,
 } from 'typeorm';
-import { EnrollmentRecordEntity } from '../../../../../../users-management/infraestructure/persistence/relational/entity/enrollment-record.entity';
 import { CoursesEntity } from '../training/courses.entity';
+import { EnrollmentRecordEntity } from '../../../../../../enrollment-management/infraestructure/persistence/relational/entity/enrollment-record.entity';
 
 @Entity()
 export class DrivingTeoricRecordEntity {
@@ -42,6 +43,7 @@ export class DrivingTeoricRecordEntity {
   hours: number;
 
   @ManyToMany(() => CoursesEntity, (course) => course.drivingTeoric)
+  @JoinTable()
   courses: CoursesEntity[];
 
   // @ManyToOne(() => UserEntity, (user) => user.drivingTrainingRecords, {
