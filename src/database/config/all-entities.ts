@@ -4,7 +4,9 @@ import { AuditableEventEntity } from '@src/modules/shared-kernel/infraestructure
 import { DrivingTrainingRecordEntity } from '../../modules/driving-management/infraestructure/persistence/relational/entity/practice-register/driving-training-record.entity';
 import { DrivingTrainingDailyLogEntity } from '../../modules/driving-management/infraestructure/persistence/relational/entity/practice-register/driving-training-daily-log.entity';
 import { DrivingTeoricRecordEntity } from '../../modules/driving-management/infraestructure/persistence/relational/entity/teoric-register/driving-teoric-record.entity';
-import { EnrollmentRecordEntity } from '../../modules/users-management/infraestructure/persistence/relational/entity/enrollment-record.entity';
+import { EnrollmentRecordEntity } from '../../modules/enrollment-management/infraestructure/persistence/relational/entity/enrollment-record.entity';
+import { CoursesEntity } from '../../modules/driving-management/infraestructure/persistence/relational/entity/training/courses.entity';
+import { LicenseCategoryEntity } from '../../modules/driving-management/infraestructure/persistence/relational/entity/training/license-category.entity';
 
 export const allEntities = [
   AuditableEventEntity,
@@ -14,4 +16,6 @@ export const allEntities = [
   DrivingTrainingDailyLogEntity,
   DrivingTeoricRecordEntity,
   EnrollmentRecordEntity,
+  CoursesEntity,
+  LicenseCategoryEntity,
 ];
