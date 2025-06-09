@@ -1,11 +1,12 @@
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { routesV1 } from '../../../config/app-routes';
-import { Body, Controller, Get, Logger, Post } from '@nestjs/common';
+import { Body, Controller, Get, Logger, Post, Query } from '@nestjs/common';
 import { DrivingManagementService } from '../application/services/driving-management.service';
 import { randomUUID } from 'crypto';
 import { CourseDto } from '../application/dtos/course-dto';
 import { LicenseCategoryEntity } from '../infraestructure/persistence/relational/entity/training/license-category.entity';
 import { LicenceCategoryDto } from '../application/dtos/licence-category-dto';
+import { CreateDrivingTeoricRecordDto } from '../application/dtos/create-driving-teoric-record.dto';
 
 @ApiTags(routesV1.driving.root)
 @Controller(routesV1.version)
@@ -47,5 +48,22 @@ export class DrivingManagementHttpController {
   @Get(routesV1.driving.licenceCategory)
   findLicenseCategory(): Promise<LicenseCategoryEntity[]> {
     return this.drivingManagementService.findLicenseCategory();
+  }
+
+  @ApiOperation({ summary: 'Crear registro de teorica' })
+  @Post(routesV1.driving.generateDrivingTeoricRecord)
+  createDrivingTeoricRecord(
+    @Body() bodyParams: CreateDrivingTeoricRecordDto,
+  ): Promise<any> {
+    console.log('bodyParams', bodyParams);
+    return this.drivingManagementService.createDrivingTeoricRecord(bodyParams);
+  }
+
+  @ApiOperation({ summary: 'Obtener registros teoricos por participante' })
+  @Get(routesV1.driving.findDrivingTrainingRecordByParticipant)
+  findDrivingTrainingRecordByParticipant(@Query() query: { id: string }) {
+    return this.drivingManagementService.findDrivingTeoricRecordByParticipant(
+      query.id,
+    );
   }
 }

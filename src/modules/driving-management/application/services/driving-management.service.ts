@@ -10,6 +10,10 @@ import { CoursesEntity } from '../../infraestructure/persistence/relational/enti
 import { CourseDto } from '../dtos/course-dto';
 import { LicenseCategoryEntity } from '../../infraestructure/persistence/relational/entity/training/license-category.entity';
 import { LicenceCategoryDto } from '../dtos/licence-category-dto';
+import { EnrollmentRecordEntity } from '../../../enrollment-management/infraestructure/persistence/relational/entity/enrollment-record.entity';
+import { UserHasNoEnrollmentActive } from '../../../enrollment-management/domain/failures/enrollment.failure';
+import { DrivingTeoricRecordEntity } from '../../infraestructure/persistence/relational/entity/teoric-register/driving-teoric-record.entity';
+import { CreateDrivingTeoricRecordDto } from '../dtos/create-driving-teoric-record.dto';
 
 @Injectable()
 export class DrivingManagementService {
@@ -21,6 +25,12 @@ export class DrivingManagementService {
     private readonly coursesRepository: Repository<CoursesEntity>,
     @InjectRepository(LicenseCategoryEntity)
     private readonly licenseCategoryRepository: Repository<LicenseCategoryEntity>,
+    @InjectRepository(UserEntity)
+    private readonly userRepository: Repository<UserEntity>,
+    @InjectRepository(EnrollmentRecordEntity)
+    private readonly enrollmentRecordRepository: Repository<EnrollmentRecordEntity>,
+    @InjectRepository(DrivingTeoricRecordEntity)
+    private readonly drivingTeoricRecordRepository: Repository<DrivingTeoricRecordEntity>,
     // @InjectRepository(DrivingTrainingDailyLogEntity)
     // private readonly drivingTrainingDailyLogRepository: Repository<DrivingTrainingDailyLogEntity>,
   ) {}
@@ -28,13 +38,56 @@ export class DrivingManagementService {
   //   return await this.commentsRepository.find();
   // }
 
-  async createDrivingTrainingRecord(
-    participant: UserEntity,
-  ): Promise<CommentsDto> {
-    return await this.drivingTrainingRecordRepository.save({
+  async createDrivingTrainingRecord(participant: string): Promise<void> {
+    const user = await this.userRepository
+      .createQueryBuilder('user')
+      .where('user.id = :id', { id: participant })
+      .getOne();
+    console.log('user', user);
+  }
+  async createDrivingTeoricRecord(
+    bodyParams: CreateDrivingTeoricRecordDto,
+  ): Promise<void> {
+    const { id, ...rest } = bodyParams;
+    const enrolledActive = await this.enrollmentRecordRepository
+      .createQueryBuilder('enrollment')
+      .leftJoinAndSelect('enrollment.enrolledUser', 'user')
+      .leftJoinAndSelect('enrollment.desiredLicense', 'license')
+      .leftJoinAndSelect('license.courses', 'courses')
+      .where('user.id = :id', { id: id })
+      .andWhere('enrollment.status = :status', { status: 'ACTIVE' })
+      .getOne();
+
+    if (!enrolledActive) throw new UserHasNoEnrollmentActive();
+
+    console.log('enrolledActive', enrolledActive.desiredLicense.courses);
+    const newDrivingTeoricRecord = this.drivingTeoricRecordRepository.create({
       id: randomUUID(),
-      participant: participant,
+      enrollmentRecord: enrolledActive,
+      courses: enrolledActive.desiredLicense.courses,
+      ...rest,
     });
+    await this.drivingTeoricRecordRepository.save(newDrivingTeoricRecord);
+  }
+
+  async findDrivingTeoricRecordByParticipant(
+    participantId: string,
+  ): Promise<DrivingTeoricRecordEntity[]> {
+    const enrolledActive = await this.enrollmentRecordRepository
+      .createQueryBuilder('enrollment')
+      .leftJoinAndSelect('enrollment.enrolledUser', 'user')
+      .leftJoinAndSelect(
+        'enrollment.drivingTeoricRecords',
+        'drivingTeoricRecords',
+      )
+      .leftJoinAndSelect('drivingTeoricRecords.courses', 'courses')
+      .where('user.id = :id', { id: participantId })
+      .andWhere('enrollment.status = :status', { status: 'ACTIVE' })
+      .getOne();
+
+    if (!enrolledActive) throw new UserHasNoEnrollmentActive();
+
+    return enrolledActive.drivingTeoricRecords;
   }
 
   async createLicenseCategory(
@@ -51,7 +104,6 @@ export class DrivingManagementService {
     });
     await this.licenseCategoryRepository.save(newLicenseCategory);
 
-    console.log('newLicenseCategory', newLicenseCategory);
     return newLicenseCategory;
   }
 

@@ -22,6 +22,9 @@ export class LicenseCategoryEntity {
   @JoinTable()
   courses: CoursesEntity[];
 
-  @OneToMany(() => EnrollmentRecordEntity, (driving) => driving.desiredLicence)
-  enrollment: EnrollmentRecordEntity;
+  @OneToMany(
+    () => EnrollmentRecordEntity,
+    (enrollments) => enrollments.desiredLicense,
+  )
+  enrollments: EnrollmentRecordEntity[];
 }

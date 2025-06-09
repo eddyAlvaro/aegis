@@ -15,6 +15,6 @@ export class EnrollmentManagementHttpController {
   @Post(routesV1.enrollmentManagement.registerStudent)
   enrollmentStudent(@Body() body: EnrollmentUserDto) {
     console.log('body', body);
-    this.enrollmentManagementService.createEnrollmentStudent(body);
+    return this.enrollmentManagementService.createEnrollmentStudent(body);
   }
 }
