@@ -26,7 +26,7 @@ export class EnrollmentRecordEntity {
   drivingTeoricRecords: DrivingTeoricRecordEntity[];
 
   @OneToMany(
-    () => DrivingTeoricRecordEntity,
+    () => DrivingTrainingRecordEntity,
     (driving) => driving.enrollmentRecord,
   )
   drivingTrainingRecords: DrivingTrainingRecordEntity[];
@@ -43,8 +43,11 @@ export class EnrollmentRecordEntity {
   @Column({ type: 'timestamptz', nullable: true })
   classEndDate: Date | null;
 
-  @ManyToOne(() => LicenseCategoryEntity, (driving) => driving.enrollment)
-  desiredLicence: LicenseCategoryEntity;
+  @ManyToOne(
+    () => LicenseCategoryEntity,
+    (desiredLicense) => desiredLicense.enrollments,
+  )
+  desiredLicense: LicenseCategoryEntity;
 
   @Column({ type: 'varchar', length: 50, nullable: true })
   schedule: string;

@@ -24,10 +24,10 @@ export class DrivingTeoricRecordEntity {
   )
   enrollmentRecord: EnrollmentRecordEntity;
 
-  @Column({ type: 'date', nullable: true })
+  @Column({ type: 'timestamp', nullable: true })
   initDate: Date | null;
 
-  @Column({ type: 'date', nullable: true })
+  @Column({ type: 'timestamp', nullable: true })
   endDate: Date | null;
 
   @Column({ type: 'varchar', length: 50, nullable: true })

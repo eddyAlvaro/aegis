@@ -15,6 +15,12 @@ import { UserAlreadyExistsByDocument } from '../../../users-management/domain/fa
 import { EnrollmentRecordEntity } from '../../infraestructure/persistence/relational/entity/enrollment-record.entity';
 import { id } from 'fp-ts/lib/Refinement';
 import { LicenseCategoryEntity } from '../../../driving-management/infraestructure/persistence/relational/entity/training/license-category.entity';
+import {
+  LicenceNotFound,
+  UserHasEnrollmentActive,
+} from '../../domain/failures/enrollment.failure';
+import { DrivingTeoricRecordEntity } from '../../../driving-management/infraestructure/persistence/relational/entity/teoric-register/driving-teoric-record.entity';
+import { DrivingTrainingRecordEntity } from '../../../driving-management/infraestructure/persistence/relational/entity/practice-register/driving-training-record.entity';
 
 @Injectable()
 export class EnrollmentManagementService {
@@ -25,6 +31,10 @@ export class EnrollmentManagementService {
     private readonly typeOrmEnrollmentRecordRepository: Repository<EnrollmentRecordEntity>,
     @InjectRepository(LicenseCategoryEntity)
     private readonly typeOrmLicenseCategoryRepository: Repository<LicenseCategoryEntity>,
+    @InjectRepository(DrivingTeoricRecordEntity)
+    private readonly typeOrmDrivingTeoricRecordRepository: Repository<DrivingTeoricRecordEntity>,
+    @InjectRepository(DrivingTrainingRecordEntity)
+    private readonly typeOrmDrivingTrainingRecordRepository: Repository<DrivingTrainingRecordEntity>,
   ) {}
 
   private buildCommonQueryBuilder() {
@@ -72,23 +82,28 @@ export class EnrollmentManagementService {
       relations: ['enrollmentRecords'],
     });
 
-    const viewEnrollmentRecord = await this.typeOrmEnrollmentRecordRepository
-      .createQueryBuilder('enrollment')
-      .leftJoinAndSelect('enrollment.enrolledUser', 'user')
-      .leftJoinAndSelect('enrollment.desiredLicence', 'license')
-      .getMany();
+    const licence = await this.typeOrmLicenseCategoryRepository
+      .createQueryBuilder('license')
+      .leftJoinAndSelect('license.enrollments', 'enrollment')
+      .where('license.id = :id', { id: body.desiredLicense })
+      .getOne();
 
-    console.log('viewEnrollmentRecord', viewEnrollmentRecord);
+    if (!licence) {
+      throw new LicenceNotFound();
+    }
 
-    const licence = await this.typeOrmLicenseCategoryRepository.findOne({
-      where: {
-        id: body.desiredLicence.id,
-      },
-    });
+    if (existingUser) {
+      const enrolledActive = await this.typeOrmEnrollmentRecordRepository
+        .createQueryBuilder('enrollment')
+        .leftJoinAndSelect('enrollment.enrolledUser', 'user')
+        .where('user.id = :id', { id: existingUser.id })
+        .andWhere('enrollment.status = :status', { status: 'ACTIVE' })
+        .getOne();
 
-    console.log('isValidUser', existingUser, licence);
+      if (enrolledActive) {
+        throw new UserHasEnrollmentActive();
+      }
 
-    if (existingUser && licence) {
       const newEnrolledUser = await this.typeOrmEnrollmentRecordRepository.save(
         {
           id: randomUUID(),
@@ -97,7 +112,12 @@ export class EnrollmentManagementService {
           ...enrollmentRecords,
         },
       );
-      console.log('newEnrolledUser', newEnrolledUser);
+
+      await this.typeOrmDrivingTrainingRecordRepository.save({
+        id: randomUUID(),
+        enrollmentRecord: newEnrolledUser,
+      });
+
       return newEnrolledUser;
     }
 
@@ -109,12 +129,22 @@ export class EnrollmentManagementService {
       ...rest,
     });
 
-    return await this.typeOrmEnrollmentRecordRepository.save({
+    const newEnrolledUser = await this.typeOrmEnrollmentRecordRepository.save({
       id: randomUUID(),
       enrolledUser: createdUser,
       desiredLicense: licence,
       ...enrollmentRecords,
     });
+    await this.typeOrmDrivingTeoricRecordRepository.save({
+      id: randomUUID(),
+      enrollmentRecord: newEnrolledUser,
+    });
+
+    await this.typeOrmDrivingTrainingRecordRepository.save({
+      id: randomUUID(),
+      enrollmentRecord: newEnrolledUser,
+    });
+    return newEnrolledUser;
   }
 
   async viewUserTeoricRecords(query: string): Promise<any> {

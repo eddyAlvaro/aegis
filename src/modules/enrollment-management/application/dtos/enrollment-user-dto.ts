@@ -27,11 +27,15 @@ export class EnrollmentUserDto {
   currentLicense: 'A-I' | 'A-IIb';
 
   @IsDefined()
-  desiredLicence: LicenseCategoryEntity;
+  desiredLicense: string;
 
   @IsDefined()
   enrollmentRecords: Omit<
     EnrollmentRecordEntity,
-    'id' | 'enrolledUser' | 'desiredLicence'
+    | 'id'
+    | 'enrolledUser'
+    | 'desiredLicense'
+    | 'drivingTeoricRecords'
+    | 'drivingTrainingRecords'
   >;
 }
