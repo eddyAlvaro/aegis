@@ -35,6 +35,7 @@ export function applyFilters<T extends ObjectLiteral>(
     }
     const paramName = `${field}_${index}`;
 
+    console.log('fieldWithAlias', fieldWithAlias);
     switch (type) {
       case 'equal':
         if (isValidDate(value)) {

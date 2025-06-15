@@ -50,6 +50,7 @@ export const routesV1 = {
     findDrivingTrainingRecordByParticipant: `/${driving}/find-driving-training-record-by-participant`,
     courses: `/${driving}/courses`,
     licenceCategory: `/${driving}/licence-category`,
+    updateLicenceCategory: `/${driving}/update-licence-category`,
     generateDrivingTeoricRecord: `/${driving}/create-driving-teoric-record`,
   },
 
@@ -57,6 +58,7 @@ export const routesV1 = {
     root: enrollmentManagement,
     registerStudent: `/${enrollmentManagement}/register-student`,
     updateEnrollmentForStudent: `/${enrollmentManagement}/update-enrollment-for-student`,
+    findEnrollmentForStudent: `/${enrollmentManagement}/find-enrollment-for-student`,
   },
 
   usersManagement: {

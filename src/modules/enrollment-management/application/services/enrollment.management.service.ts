@@ -147,6 +147,15 @@ export class EnrollmentManagementService {
     return newEnrolledUser;
   }
 
+  async findEnrollmentForStudent(userId: string): Promise<any> {
+    const enrollmentRecords = await this.typeOrmEnrollmentRecordRepository
+      .createQueryBuilder('enrollment')
+      .leftJoinAndSelect('enrollment.enrolledUser', 'user')
+      .where('user.id = :id', { id: userId })
+      .getMany();
+
+    return enrollmentRecords;
+  }
   async viewUserTeoricRecords(query: string): Promise<any> {
     // validar que la matricula este activa
   }

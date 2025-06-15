@@ -29,3 +29,13 @@ export class UserHasNoEnrollmentActive extends ExceptionBase {
     super(UserHasNoEnrollmentActive.message, cause, metadata);
   }
 }
+
+export class NoCoursesAvailable extends ExceptionBase {
+  static readonly message = 'No hay cursos disponibles';
+
+  public readonly code = 'NO_COURSES_AVAILABLE';
+
+  constructor(cause?: Error, metadata?: unknown) {
+    super(NoCoursesAvailable.message, cause, metadata);
+  }
+}

@@ -1,8 +1,8 @@
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
-import { UserManagementService } from '../application/services/user.management.service';
 import { Controller, Get, Query } from '@nestjs/common';
 import { routesV1 } from '../../../config/app-routes';
 import { PaginatedQueryRequestDto } from '../../../platform/api/paginated-query.request.dto';
+import { UserManagementService } from '../application/services/user.management.service';
 
 @ApiTags(routesV1.usersManagement.root)
 @Controller(routesV1.version)
@@ -14,6 +14,7 @@ export class UserManagementHttpController {
   viewPaginatedUsers(
     @Query() requestDto: PaginatedQueryRequestDto,
   ): Promise<any> {
+    console.log('requestDto', requestDto);
     return this.userManagementService.viewPaginatedUsers(requestDto);
   }
 }
