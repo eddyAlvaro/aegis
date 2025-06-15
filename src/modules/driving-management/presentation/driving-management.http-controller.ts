@@ -7,6 +7,7 @@ import { CourseDto } from '../application/dtos/course-dto';
 import { LicenseCategoryEntity } from '../infraestructure/persistence/relational/entity/training/license-category.entity';
 import { LicenceCategoryDto } from '../application/dtos/licence-category-dto';
 import { CreateDrivingTeoricRecordDto } from '../application/dtos/create-driving-teoric-record.dto';
+import { UpdateCoursesForLicenseCategoryDto } from '../application/dtos/update-licence-category.dto';
 
 @ApiTags(routesV1.driving.root)
 @Controller(routesV1.version)
@@ -25,7 +26,8 @@ export class DrivingManagementHttpController {
   }
   @ApiOperation({ summary: 'Crear curso' })
   @Post(routesV1.driving.courses)
-  createCourse(@Body() bodyParams: CourseDto): Promise<void> {
+  createCourse(@Body() bodyParams: Omit<CourseDto, 'id'>): Promise<void> {
+    console.log('bodyParams', bodyParams);
     return this.drivingManagementService.createCourse(bodyParams);
   }
 
@@ -42,6 +44,15 @@ export class DrivingManagementHttpController {
   ): Promise<void> {
     console.log('bodyParams', bodyParams);
     return this.drivingManagementService.createLicenseCategory(bodyParams);
+  }
+  @ApiOperation({ summary: 'Crear licencia' })
+  @Post(routesV1.driving.updateLicenceCategory)
+  updateCoursesForLicenseCategory(
+    @Body() bodyParams: UpdateCoursesForLicenseCategoryDto,
+  ): Promise<void> {
+    return this.drivingManagementService.updateCoursesForLicenseCategory(
+      bodyParams,
+    );
   }
 
   @ApiOperation({ summary: 'Crear licencia' })

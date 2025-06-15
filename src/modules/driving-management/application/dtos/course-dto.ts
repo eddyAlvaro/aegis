@@ -1,6 +1,3 @@
-export class CourseDto {
-  name: string;
-  type: 'TEORIC' | 'PRACTICE';
-  hours: number;
-  position: number;
-}
+import { CoursesEntity } from '../../infraestructure/persistence/relational/entity/training/courses.entity';
+
+export class CourseDto extends CoursesEntity {}

@@ -11,9 +11,14 @@ import { CourseDto } from '../dtos/course-dto';
 import { LicenseCategoryEntity } from '../../infraestructure/persistence/relational/entity/training/license-category.entity';
 import { LicenceCategoryDto } from '../dtos/licence-category-dto';
 import { EnrollmentRecordEntity } from '../../../enrollment-management/infraestructure/persistence/relational/entity/enrollment-record.entity';
-import { UserHasNoEnrollmentActive } from '../../../enrollment-management/domain/failures/enrollment.failure';
+import {
+  LicenceNotFound,
+  NoCoursesAvailable,
+  UserHasNoEnrollmentActive,
+} from '../../../enrollment-management/domain/failures/enrollment.failure';
 import { DrivingTeoricRecordEntity } from '../../infraestructure/persistence/relational/entity/teoric-register/driving-teoric-record.entity';
 import { CreateDrivingTeoricRecordDto } from '../dtos/create-driving-teoric-record.dto';
+import { UpdateCoursesForLicenseCategoryDto } from '../dtos/update-licence-category.dto';
 
 @Injectable()
 export class DrivingManagementService {
@@ -60,11 +65,52 @@ export class DrivingManagementService {
 
     if (!enrolledActive) throw new UserHasNoEnrollmentActive();
 
+    const allCourses = enrolledActive.desiredLicense.courses
+      .filter((c) => c.type === 'TEORIC')
+      .sort((a, b) => a.position - b.position);
+
+    const existingRecords = await this.drivingTeoricRecordRepository
+      .createQueryBuilder('drivingTeoricRecord')
+      .leftJoinAndSelect('drivingTeoricRecord.courses', 'courses')
+      .where('drivingTeoricRecord.enrollmentRecord = :enrollment', {
+        enrollment: enrolledActive.id,
+      })
+      .getMany();
+
+    const usedCourseIds = new Set<string>();
+    existingRecords.forEach((record) => {
+      record.courses.forEach((course) => usedCourseIds.add(course.id));
+    });
+
+    const remainingCourses = allCourses.filter(
+      (course) => !usedCourseIds.has(course.id),
+    );
+
+    console.log('remainingCourses', remainingCourses);
+    const selectedCourses: CoursesEntity[] = [];
+
+    let totalHours = 0;
+
+    for (const course of remainingCourses) {
+      console.log('course', course);
+      console.log('totalHours', totalHours);
+      console.log('course.hours', course.hours);
+      console.log('bodyParams.hours', bodyParams.hours);
+      if (totalHours + course.hours <= bodyParams.hours) {
+        selectedCourses.push(course);
+        totalHours += course.hours;
+      } else {
+        break;
+      }
+    }
+
+    if (selectedCourses.length === 0) throw new NoCoursesAvailable();
+
     console.log('enrolledActive', enrolledActive.desiredLicense.courses);
     const newDrivingTeoricRecord = this.drivingTeoricRecordRepository.create({
       id: randomUUID(),
       enrollmentRecord: enrolledActive,
-      courses: enrolledActive.desiredLicense.courses,
+      courses: selectedCourses,
       ...rest,
     });
     await this.drivingTeoricRecordRepository.save(newDrivingTeoricRecord);
@@ -107,6 +153,31 @@ export class DrivingManagementService {
     return newLicenseCategory;
   }
 
+  async updateCoursesForLicenseCategory(
+    category: UpdateCoursesForLicenseCategoryDto,
+  ): Promise<any> {
+    const licence = await this.licenseCategoryRepository
+      .createQueryBuilder('license')
+      .leftJoinAndSelect('license.courses', 'courses')
+      .where('license.id = :id', { id: category.id })
+      .getOne();
+
+    if (!licence) throw new LicenceNotFound();
+
+    const courses = await this.coursesRepository.findBy({
+      id: In(category.courses),
+    });
+
+    const newLicenceCourses = [...licence.courses, ...courses];
+    const updateLicence = await this.licenseCategoryRepository.create({
+      id: category.id,
+      name: licence.name,
+      courses: newLicenceCourses,
+    });
+    await this.licenseCategoryRepository.save(updateLicence);
+    return updateLicence;
+  }
+
   async findLicenseCategory(): Promise<any> {
     const courses = await this.licenseCategoryRepository
       .createQueryBuilder('license')
@@ -116,7 +187,7 @@ export class DrivingManagementService {
     return courses;
   }
 
-  async createCourse(course: CourseDto): Promise<any> {
+  async createCourse(course: Omit<CourseDto, 'id'>): Promise<any> {
     return await this.coursesRepository.save({ id: randomUUID(), ...course });
   }
 
