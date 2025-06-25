@@ -6,7 +6,6 @@ WORKDIR /usr/src/app
 
 # Instala dependencias globales necesarias (incluye pnpm).
 RUN apk add --no-cache bash \
-  && corepack enable \
   && npm install -g pnpm
 
 # Copia solo los archivos necesarios para instalar dependencias.
