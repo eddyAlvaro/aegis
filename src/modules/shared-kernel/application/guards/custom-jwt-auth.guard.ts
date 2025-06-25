@@ -4,8 +4,8 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
-import { JsonWebTokenError, TokenExpiredError } from 'jsonwebtoken';
 import { SessionExpired } from '../../domain/failures/shared-kernel.failures';
+import { JsonWebTokenError, TokenExpiredError } from '@nestjs/jwt';
 
 @Injectable()
 export class CustomAuthGuard extends AuthGuard('jwt') {
