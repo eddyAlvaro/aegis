@@ -48,6 +48,7 @@ export const routesV1 = {
     root: driving,
     generateDrivingTrainingRecord: `/${driving}/create-driving-training-record`,
     findDrivingTrainingRecordByParticipant: `/${driving}/find-driving-training-record-by-participant`,
+    findDrivingTeoricRecordByParticipant: `/${driving}/find-driving-teoric-record-by-participant`,
     courses: `/${driving}/courses`,
     licenceCategory: `/${driving}/licence-category`,
     updateLicenceCategory: `/${driving}/update-licence-category`,

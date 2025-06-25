@@ -1,4 +1,14 @@
-import { Column, CreateDateColumn, Entity, PrimaryColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  ManyToMany,
+  ManyToOne,
+  OneToMany,
+  PrimaryColumn,
+} from 'typeorm';
+import { DrivingTrainingRecordEntity } from '../practice-register/driving-training-record.entity';
+import { LicenseCategoryEntity } from './license-category.entity';
 
 @Entity()
 export class VehiclesEntity {
@@ -16,4 +26,16 @@ export class VehiclesEntity {
 
   @CreateDateColumn()
   createdAt: Date;
+
+  @OneToMany(() => DrivingTrainingRecordEntity, (record) => record.vehicle)
+  drivingTrainingRecords: DrivingTrainingRecordEntity[];
+
+  @ManyToOne(
+    () => LicenseCategoryEntity,
+    (licenceCategory) => licenceCategory.vehicles,
+  )
+  licenceCategory: LicenseCategoryEntity;
+
+  @Column({ type: 'varchar', length: 50, nullable: true })
+  status: 'ACTIVE' | 'INACTIVE' | 'MAINTENANCE';
 }

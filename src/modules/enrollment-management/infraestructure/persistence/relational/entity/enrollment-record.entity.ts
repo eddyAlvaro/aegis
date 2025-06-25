@@ -25,11 +25,11 @@ export class EnrollmentRecordEntity {
   )
   drivingTeoricRecords: DrivingTeoricRecordEntity[];
 
-  @OneToMany(
+  @OneToOne(
     () => DrivingTrainingRecordEntity,
     (driving) => driving.enrollmentRecord,
   )
-  drivingTrainingRecords: DrivingTrainingRecordEntity[];
+  drivingTrainingRecord: DrivingTrainingRecordEntity;
 
   @Column({ type: 'varchar', length: 50, nullable: true })
   status: 'ACTIVE' | 'INACTIVE';

@@ -9,6 +9,7 @@ import {
 } from 'typeorm';
 import { EnrollmentRecordEntity } from '../../../../../../enrollment-management/infraestructure/persistence/relational/entity/enrollment-record.entity';
 import { CoursesEntity } from './courses.entity';
+import { VehiclesEntity } from './vehicles.entity';
 
 @Entity()
 export class LicenseCategoryEntity {
@@ -27,4 +28,7 @@ export class LicenseCategoryEntity {
     (enrollments) => enrollments.desiredLicense,
   )
   enrollments: EnrollmentRecordEntity[];
+
+  @OneToMany(() => VehiclesEntity, (vehiculo) => vehiculo.licenceCategory)
+  vehicles: VehiclesEntity[];
 }

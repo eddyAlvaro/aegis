@@ -8,9 +8,11 @@ import databaseConfig from '../../config/database.config';
 import appConfig from '../../../config/app.config';
 import { RoleSeedModule } from './role/role-seed.module';
 import { UserSeedModule } from './user/user-seed.module';
+import { CourseSeedModule } from './courses/course-seed.module';
 
 @Module({
   imports: [
+    CourseSeedModule,
     RoleSeedModule,
     UserSeedModule,
     ConfigModule.forRoot({
