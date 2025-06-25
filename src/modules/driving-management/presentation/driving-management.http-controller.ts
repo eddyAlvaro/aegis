@@ -71,9 +71,17 @@ export class DrivingManagementHttpController {
   }
 
   @ApiOperation({ summary: 'Obtener registros teoricos por participante' })
+  @Get(routesV1.driving.findDrivingTeoricRecordByParticipant)
+  findDrivingTeoricRecordByParticipant(@Query() query: { id: string }) {
+    return this.drivingManagementService.findDrivingTeoricRecordByParticipant(
+      query.id,
+    );
+  }
+
+  @ApiOperation({ summary: 'Obtener registros prácticos por participante' })
   @Get(routesV1.driving.findDrivingTrainingRecordByParticipant)
   findDrivingTrainingRecordByParticipant(@Query() query: { id: string }) {
-    return this.drivingManagementService.findDrivingTeoricRecordByParticipant(
+    return this.drivingManagementService.findDrivingTrainingRecordByParticipant(
       query.id,
     );
   }

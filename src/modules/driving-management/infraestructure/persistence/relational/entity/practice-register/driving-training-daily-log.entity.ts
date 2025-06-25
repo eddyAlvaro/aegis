@@ -9,8 +9,11 @@ export class DrivingTrainingDailyLogEntity {
   @IsOptional()
   id: string;
 
-  //InitDate
-  //EndDate
+  @Column({ type: 'timestamp', nullable: true })
+  initDate: Date | null;
+
+  @Column({ type: 'timestamp', nullable: true })
+  endDate: Date | null;
 
   @ManyToOne(
     () => DrivingTrainingRecordEntity,
@@ -30,4 +33,7 @@ export class DrivingTrainingDailyLogEntity {
 
   @Column({ type: 'varchar', length: 50, nullable: true })
   mileageEnd: string;
+
+  @Column({ type: 'varchar', length: 50, nullable: true })
+  instructor: string;
 }

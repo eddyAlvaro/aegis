@@ -50,6 +50,43 @@ export class DrivingManagementService {
       .getOne();
     console.log('user', user);
   }
+
+  async findDrivingTrainingRecordByParticipant(
+    participantId: string,
+  ): Promise<any> {
+    const enrollmentRecord = await this.enrollmentRecordRepository
+      .createQueryBuilder('enrollment')
+      .leftJoinAndSelect('enrollment.enrolledUser', 'user')
+      .leftJoinAndSelect(
+        'enrollment.drivingTrainingRecord',
+        'drivingTrainingRecord',
+      )
+      .leftJoinAndSelect('enrollment.desiredLicense', 'license')
+      .leftJoinAndSelect('drivingTrainingRecords.vehicle', 'vehicle')
+      .leftJoinAndSelect('drivingTrainingRecords.dailyLogs', 'dailyLogs')
+      .where('user.id = :id', { id: participantId })
+      .andWhere('enrollment.status = :status', { status: 'ACTIVE' })
+      .getOne();
+
+    if (!enrollmentRecord) throw new UserHasNoEnrollmentActive();
+
+    return {
+      id: enrollmentRecord.id,
+      procedureType: enrollmentRecord.procedureType,
+      issueDate: enrollmentRecord.issueDate,
+      enrolledUser: {
+        id: enrollmentRecord.enrolledUser.id,
+        email: enrollmentRecord.enrolledUser.email,
+        firstName: enrollmentRecord.enrolledUser.firstName,
+        lastName: enrollmentRecord.enrolledUser.lastName,
+        commonName: enrollmentRecord.enrolledUser.commonName,
+        documentIdentifier: enrollmentRecord.enrolledUser.documentIdentifier,
+        phoneNumber: enrollmentRecord.enrolledUser.phoneNumber,
+        __entity: 'UserEntity',
+      },
+      drivingTrainingRecords: enrollmentRecord.drivingTrainingRecord,
+    };
+  }
   async createDrivingTeoricRecord(
     bodyParams: CreateDrivingTeoricRecordDto,
   ): Promise<void> {

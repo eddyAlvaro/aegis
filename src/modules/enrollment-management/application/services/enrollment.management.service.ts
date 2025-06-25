@@ -113,10 +113,10 @@ export class EnrollmentManagementService {
         },
       );
 
-      await this.typeOrmDrivingTrainingRecordRepository.save({
-        id: randomUUID(),
-        enrollmentRecord: newEnrolledUser,
-      });
+      // await this.typeOrmDrivingTrainingRecordRepository.save({
+      //   id: randomUUID(),
+      //   enrollmentRecord: newEnrolledUser,
+      // });
 
       return newEnrolledUser;
     }
@@ -135,15 +135,11 @@ export class EnrollmentManagementService {
       desiredLicense: licence,
       ...enrollmentRecords,
     });
-    await this.typeOrmDrivingTeoricRecordRepository.save({
-      id: randomUUID(),
-      enrollmentRecord: newEnrolledUser,
-    });
 
-    await this.typeOrmDrivingTrainingRecordRepository.save({
-      id: randomUUID(),
-      enrollmentRecord: newEnrolledUser,
-    });
+    // await this.typeOrmDrivingTrainingRecordRepository.save({
+    //   id: randomUUID(),
+    //   enrollmentRecord: newEnrolledUser,
+    // });
     return newEnrolledUser;
   }
 

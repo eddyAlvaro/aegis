@@ -5,10 +5,12 @@ import {
   JoinColumn,
   ManyToOne,
   OneToMany,
+  OneToOne,
   PrimaryColumn,
 } from 'typeorm';
 import { DrivingTrainingDailyLogEntity } from './driving-training-daily-log.entity';
 import { EnrollmentRecordEntity } from '../../../../../../enrollment-management/infraestructure/persistence/relational/entity/enrollment-record.entity';
+import { VehiclesEntity } from '../training/vehicles.entity';
 
 @Entity()
 export class DrivingTrainingRecordEntity {
@@ -16,20 +18,22 @@ export class DrivingTrainingRecordEntity {
   @IsOptional()
   id: string;
 
-  @ManyToOne(
+  @OneToOne(
     () => EnrollmentRecordEntity,
-    (enrollment) => enrollment.drivingTrainingRecords,
+    (enrollment) => enrollment.drivingTrainingRecord,
     {
       eager: true,
       cascade: true,
     },
   )
-  @JoinColumn()
   enrollmentRecord: EnrollmentRecordEntity;
 
   @OneToMany(
-    () => DrivingTrainingRecordEntity,
-    (dailyLog) => dailyLog.dailyLogs,
+    () => DrivingTrainingDailyLogEntity,
+    (dailyLog) => dailyLog.drivingTrainingRecord,
   )
   dailyLogs: DrivingTrainingDailyLogEntity[];
+
+  @ManyToOne(() => VehiclesEntity, (vehicle) => vehicle.drivingTrainingRecords)
+  vehicle: VehiclesEntity;
 }
