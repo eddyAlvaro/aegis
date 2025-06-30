@@ -1,9 +1,11 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { UserEntity } from '../../users-management/infraestructure/persistence/relational/entity/user.entity';
 import { routesV1 } from '../../../config/app-routes';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { EnrollmentManagementService } from '../application/services/enrollment.management.service';
 import { EnrollmentUserDto } from '../application/dtos/enrollment-user-dto';
+import { AuthorizationGuard } from '../../shared-kernel/application/guards/authorization.guard';
+import { CustomAuthGuard } from '../../shared-kernel/application/guards/custom-jwt-auth.guard';
 
 @ApiTags(routesV1.enrollmentManagement.root)
 @Controller(routesV1.version)
