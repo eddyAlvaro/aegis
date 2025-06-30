@@ -48,7 +48,8 @@ export enum GrantId {
   // PlatformOfferCanUpdate = 'PLATFORM_OFFER_CAN_UPDATE',
   // PlatformUsersCanView = 'PLATFORM_USERS_CAN_VIEW',
   // PlatformOfferCanUpdateAppraisal = 'PLATFORM_OFFER_CAN_UPDATE_APPRAISAL',
-  // PlatformUsersCanViewParticipants = 'PLATFORM_USERS_CAN_VIEW_PARTICIPANTS',
+  PlatformUsersCanViewParticipants = 'PLATFORM_USERS_CAN_VIEW_PARTICIPANTS',
+  PlatformCanRegisterParticipant = 'PLATFORM_CAN_REGISTER_PARTICIPANT',
   // PlatformUsersCanViewAdministrators = 'PLATFORM_USERS_CAN_VIEW_ADMINISTRATORS',
   // PlatformUsersCanExportAdministrators = 'PLATFORM_USERS_CAN_EXPORT_ADMINISTRATORS',
   // PlatformUsersCanExportParticipants = 'PLATFORM_USERS_CAN_EXPORT_PARTICIPANTS',
@@ -127,7 +128,7 @@ export const grantMap: Record<
     // | 'payment-management'
     // | 'offer-management'
     // | 'role-management'
-    'user-management';
+    'user-management' | 'enrollment-management';
     // | 'bid-management'
     // | 'finance'
     // | 'kpi-management'
@@ -141,6 +142,17 @@ export const grantMap: Record<
     type: 'platform',
     module: 'user-management',
   },
+  [GrantId.PlatformUsersCanViewParticipants]: {
+    name: 'Puede ver participantes',
+    type: 'platform',
+    module: 'user-management',
+  },
+  [GrantId.PlatformCanRegisterParticipant]: {
+    name: 'Puede registrar participantes',
+    type: 'platform',
+    module: 'enrollment-management',
+  },
+
   // [GrantId.PlatformUsersCanFilterParticipants]: {
   //   name: 'Puede filtrar participantes',
   //   type: 'platform',

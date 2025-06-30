@@ -21,6 +21,7 @@ import { UsersManagementModule } from './modules/users-management/users-manageme
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { DrivingModule } from './modules/driving-management/driving.module';
 import { EnrollmentManagementModule } from './modules/enrollment-management/enrollment-management.module';
+import { CredentialsManagementModule } from './modules/creadentials-management/credentials-management.module';
 const infrastructureDatabaseModule = TypeOrmModule.forRootAsync({
   useClass: TypeOrmConfigService,
   dataSourceFactory: async (options: DataSourceOptions) => {
@@ -71,6 +72,7 @@ const infrastructureDatabaseModule = TypeOrmModule.forRootAsync({
     UsersManagementModule,
     DrivingModule,
     EnrollmentManagementModule,
+    CredentialsManagementModule,
   ],
 })
 export class AppModule {}

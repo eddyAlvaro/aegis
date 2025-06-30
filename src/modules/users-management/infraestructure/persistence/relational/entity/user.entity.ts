@@ -18,6 +18,7 @@ import { UserType } from '../../../../domain/types/user-type';
 import { SimpleDomainFailure } from '../../../../../shared-kernel/domain/failures/shared-kernel.failures';
 import { UserStatus } from '../../../../domain/types/user-status';
 import { EnrollmentRecordEntity } from '../../../../../enrollment-management/infraestructure/persistence/relational/entity/enrollment-record.entity';
+import { PasswordResetTokenEntity } from '../../../../../creadentials-management/infraestructure/persistence/relational/password-reset-token.entity';
 
 @Entity()
 export class UserEntity extends EntityRelationalHelper {
@@ -71,11 +72,11 @@ export class UserEntity extends EntityRelationalHelper {
   @Column({ type: 'enum', enum: UserStatus, nullable: false })
   status: UserStatus;
 
-  // @OneToMany(
-  //   () => PasswordResetTokenEntity,
-  //   (passwordResetToken) => passwordResetToken.user,
-  // )
-  // passwordResetTokens: PasswordResetTokenEntity[];
+  @OneToMany(
+    () => PasswordResetTokenEntity,
+    (passwordResetToken) => passwordResetToken.user,
+  )
+  passwordResetTokens: PasswordResetTokenEntity[];
 
   // @OneToMany(
   //   () => TransferenceSupportEntity,

@@ -13,6 +13,8 @@ import {
   applySorts,
 } from '../../../../platform/utils/pagination/pagination-utils';
 import { buildDefaultSort } from '../../../../platform/constants/default-sort';
+import { UserNotFoundFailure } from '../../domain/failures/user.failure';
+import { queryObjects } from 'v8';
 
 @Injectable()
 export class UserManagementService {
@@ -81,5 +83,23 @@ export class UserManagementService {
       page: query.page,
       limit: query.limit,
     });
+  }
+
+  async getUserDetail(user: {
+    field: string;
+    value: string;
+  }): Promise<UserEntity> {
+    const findUser = await this.typeOrmUserRepository
+      .createQueryBuilder('user')
+      .leftJoinAndSelect('user.roles', 'roles')
+      // .where('user.' + user.field + ':email ', { email: user.value })
+      .where(`user.${user.field} = :value`, { value: user.value })
+      .getOne();
+
+    if (!findUser) {
+      throw new UserNotFoundFailure();
+    }
+
+    return findUser;
   }
 }

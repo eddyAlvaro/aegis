@@ -1,4 +1,4 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Post, UseGuards } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import { routesV1 } from '../../../../config/app-routes';
@@ -19,9 +19,14 @@ import { MailService } from '../../../../mail/mail.service';
 import { EmailAlreadyUsed } from '@src/users/domain/failures/user.failures';
 import { RegisterEnrollmentDto } from './dtos/register-enrollment.dto';
 import { DrivingTrainingRecordEntity } from '../../../driving-management/infraestructure/persistence/relational/entity/practice-register/driving-training-record.entity';
+import { CustomAuthGuard } from '../../../shared-kernel/application/guards/custom-jwt-auth.guard';
+import { AuthorizationGuard } from '../../../shared-kernel/application/guards/authorization.guard';
+import { Grants } from '../../../shared-kernel/application/decorators/permissions';
+import { GrantId } from '../../../role-configuration/domain/types/grants';
 
 @ApiTags(routesV1.authManagement.root)
 @Controller(routesV1.version)
+@UseGuards(CustomAuthGuard, AuthorizationGuard)
 export class RegisterEnrollmentHttpController {
   constructor(
     @InjectRepository(UserEntity)
@@ -32,6 +37,7 @@ export class RegisterEnrollmentHttpController {
 
   @ApiOperation({ summary: 'Register participant' })
   @Post(routesV1.authManagement.registerParticipant)
+  @Grants(GrantId.PlatformCanRegisterParticipant)
   async create(@Body() body: RegisterEnrollmentDto): Promise<any> {
     const existingUserByPhoneNumber = await this.typeOrmUserRepository.findOne({
       where: {
