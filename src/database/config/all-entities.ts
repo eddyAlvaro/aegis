@@ -8,6 +8,7 @@ import { EnrollmentRecordEntity } from '../../modules/enrollment-management/infr
 import { CoursesEntity } from '../../modules/driving-management/infraestructure/persistence/relational/entity/training/courses.entity';
 import { LicenseCategoryEntity } from '../../modules/driving-management/infraestructure/persistence/relational/entity/training/license-category.entity';
 import { PasswordResetTokenEntity } from '../../modules/creadentials-management/infraestructure/persistence/relational/password-reset-token.entity';
+import { VehiclesEntity } from '../../modules/driving-management/infraestructure/persistence/relational/entity/training/vehicles.entity';
 
 export const allEntities = [
   AuditableEventEntity,
@@ -20,4 +21,5 @@ export const allEntities = [
   CoursesEntity,
   LicenseCategoryEntity,
   PasswordResetTokenEntity,
+  VehiclesEntity,
 ];

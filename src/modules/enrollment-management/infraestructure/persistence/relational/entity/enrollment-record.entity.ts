@@ -1,6 +1,7 @@
 import {
   Column,
   Entity,
+  JoinColumn,
   ManyToOne,
   OneToMany,
   OneToOne,
@@ -29,6 +30,7 @@ export class EnrollmentRecordEntity {
     () => DrivingTrainingRecordEntity,
     (driving) => driving.enrollmentRecord,
   )
+  @JoinColumn()
   drivingTrainingRecord: DrivingTrainingRecordEntity;
 
   @Column({ type: 'varchar', length: 50, nullable: true })

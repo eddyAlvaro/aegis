@@ -2,7 +2,7 @@ import { CoursesEntity } from '../../../../../modules/driving-management/infraes
 
 export const coursesData: Omit<
   CoursesEntity,
-  'id' | 'license' | 'drivingTeoric'
+  'id' | 'license' | 'drivingTeoric' | 'dailyLogs'
 >[] = [
   {
     name: 'Mecanica Automotriz Basica.',

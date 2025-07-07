@@ -20,6 +20,9 @@ import { CustomAuthGuard } from '../../shared-kernel/application/guards/custom-j
 import { AuthorizationGuard } from '../../shared-kernel/application/guards/authorization.guard';
 import { Grants } from '../../shared-kernel/application/decorators/permissions';
 import { GrantId } from '../../role-configuration/domain/types/grants';
+import { CreateVehicleDto } from '../application/dtos/create-vehicle.dto';
+import { CreateDrivingTrainingRecordDto } from '../application/dtos/create-driving-training-record.dto';
+import { CreateDrivingTrainingDailyRecordDto } from '../application/dtos/create-driving-training-daily-record.dto';
 
 @ApiTags(routesV1.driving.root)
 @Controller(routesV1.version)
@@ -33,11 +36,25 @@ export class DrivingManagementHttpController {
   @ApiOperation({ summary: 'Crear registro de entrenamiento' })
   @Post(routesV1.driving.generateDrivingTrainingRecord)
   @Grants(GrantId.PlatformUsersCanViewParticipants)
-  createDrivingTrainingRecord(@Body() bodyParams: any): Promise<any> {
+  createDrivingTrainingRecord(
+    @Body() bodyParams: CreateDrivingTrainingRecordDto,
+  ): Promise<any> {
     return this.drivingManagementService.createDrivingTrainingRecord(
       bodyParams,
     );
   }
+
+  @ApiOperation({ summary: 'Crear registro de entrenamiento' })
+  @Post(routesV1.driving.generateDrivingTrainingDailyRecord)
+  @Grants(GrantId.PlatformUsersCanViewParticipants)
+  createDrivingTrainingDailyRecord(
+    @Body() bodyParams: CreateDrivingTrainingDailyRecordDto,
+  ): Promise<any> {
+    return this.drivingManagementService.createDrivingTrainingDailyLog(
+      bodyParams,
+    );
+  }
+
   @ApiOperation({ summary: 'Crear curso' })
   @Post(routesV1.driving.courses)
   @Grants(GrantId.PlatformUsersCanViewParticipants)
@@ -106,5 +123,19 @@ export class DrivingManagementHttpController {
     return this.drivingManagementService.findDrivingTrainingRecordByParticipant(
       query.id,
     );
+  }
+
+  @ApiOperation({ summary: 'Crear vehículo' })
+  @Post(routesV1.driving.createVehicle)
+  @Grants(GrantId.PlatformUsersCanViewParticipants)
+  createVehicle(@Body() bodyParams: CreateVehicleDto) {
+    return this.drivingManagementService.createVehicle(bodyParams);
+  }
+
+  @ApiOperation({ summary: 'Obtener vehículos' })
+  @Get(routesV1.driving.findVehicles)
+  @Grants(GrantId.PlatformUsersCanViewParticipants)
+  findVehicles() {
+    return this.drivingManagementService.findVehicles();
   }
 }
