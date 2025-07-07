@@ -12,14 +12,14 @@ import { LicenseCategoryEntity } from './license-category.entity';
 
 @Entity()
 export class VehiclesEntity {
-  @PrimaryColumn('text')
+  @PrimaryColumn('uuid')
   id: string;
 
   @Column({ name: 'plate_number', unique: true })
   plateNumber: string; // Ej: "BVV-196"
 
   @Column({ name: 'category' })
-  category: string; // Ej: "M1"
+  category: 'M1' | 'M2'; // Ej: "M1"
 
   @Column({ name: 'mileage' })
   mileage: string; // Ej: 26833

@@ -39,3 +39,13 @@ export class NoCoursesAvailable extends ExceptionBase {
     super(NoCoursesAvailable.message, cause, metadata);
   }
 }
+
+export class TrainingRecordAlreadyExists extends ExceptionBase {
+  static readonly message = 'Ya existe un registro para reportes de conducción';
+
+  public readonly code = 'TRAINING_RECORD.ALREADY_EXISTS';
+
+  constructor(cause?: Error, metadata?: unknown) {
+    super(TrainingRecordAlreadyExists.message, cause, metadata);
+  }
+}

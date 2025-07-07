@@ -1,6 +1,14 @@
-import { Column, Entity, ManyToMany, ManyToOne, PrimaryColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  ManyToMany,
+  ManyToOne,
+  OneToMany,
+  PrimaryColumn,
+} from 'typeorm';
 import { DrivingTeoricRecordEntity } from '../teoric-register/driving-teoric-record.entity';
 import { LicenseCategoryEntity } from './license-category.entity';
+import { DrivingTrainingDailyLogEntity } from '../practice-register/driving-training-daily-log.entity';
 
 @Entity()
 export class CoursesEntity {
@@ -24,4 +32,7 @@ export class CoursesEntity {
 
   @ManyToMany(() => DrivingTeoricRecordEntity, (teoric) => teoric.courses)
   drivingTeoric: DrivingTeoricRecordEntity[];
+
+  @OneToMany(() => DrivingTrainingDailyLogEntity, (dailyLog) => dailyLog.course)
+  dailyLogs: DrivingTrainingDailyLogEntity[];
 }

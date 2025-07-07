@@ -53,6 +53,9 @@ export const routesV1 = {
     licenceCategory: `/${driving}/licence-category`,
     updateLicenceCategory: `/${driving}/update-licence-category`,
     generateDrivingTeoricRecord: `/${driving}/create-driving-teoric-record`,
+    createVehicle: `/${driving}/create-vehicle`,
+    findVehicles: `/${driving}/find-vehicles`,
+    generateDrivingTrainingDailyRecord: `/${driving}/create-driving-training-daily-record`,
   },
 
   enrollmentManagement: {

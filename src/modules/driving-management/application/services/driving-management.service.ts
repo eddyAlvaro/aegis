@@ -14,11 +14,18 @@ import { EnrollmentRecordEntity } from '../../../enrollment-management/infraestr
 import {
   LicenceNotFound,
   NoCoursesAvailable,
+  TrainingRecordAlreadyExists,
   UserHasNoEnrollmentActive,
 } from '../../../enrollment-management/domain/failures/enrollment.failure';
 import { DrivingTeoricRecordEntity } from '../../infraestructure/persistence/relational/entity/teoric-register/driving-teoric-record.entity';
 import { CreateDrivingTeoricRecordDto } from '../dtos/create-driving-teoric-record.dto';
 import { UpdateCoursesForLicenseCategoryDto } from '../dtos/update-licence-category.dto';
+import { CreateDrivingTrainingDailyRecordDto } from '../dtos/create-driving-training-daily-record.dto';
+import { VehiclesEntity } from '../../infraestructure/persistence/relational/entity/training/vehicles.entity';
+import { CreateVehicleDto } from '../dtos/create-vehicle.dto';
+import { CreateDrivingTrainingRecordDto } from '../dtos/create-driving-training-record.dto';
+import { VehicleNotFound } from '../../domain/failures/driving.failure';
+import { DrivingTrainingDailyLogEntity } from '../../infraestructure/persistence/relational/entity/practice-register/driving-training-daily-log.entity';
 
 @Injectable()
 export class DrivingManagementService {
@@ -36,6 +43,10 @@ export class DrivingManagementService {
     private readonly enrollmentRecordRepository: Repository<EnrollmentRecordEntity>,
     @InjectRepository(DrivingTeoricRecordEntity)
     private readonly drivingTeoricRecordRepository: Repository<DrivingTeoricRecordEntity>,
+    @InjectRepository(VehiclesEntity)
+    private readonly vehiclesRepository: Repository<VehiclesEntity>,
+    @InjectRepository(DrivingTrainingDailyLogEntity)
+    private readonly drivingTrainingDailyLogRepository: Repository<DrivingTrainingDailyLogEntity>,
     // @InjectRepository(DrivingTrainingDailyLogEntity)
     // private readonly drivingTrainingDailyLogRepository: Repository<DrivingTrainingDailyLogEntity>,
   ) {}
@@ -43,12 +54,108 @@ export class DrivingManagementService {
   //   return await this.commentsRepository.find();
   // }
 
-  async createDrivingTrainingRecord(participant: string): Promise<void> {
-    const user = await this.userRepository
-      .createQueryBuilder('user')
-      .where('user.id = :id', { id: participant })
+  async createDrivingTrainingRecord(
+    bodyParams: CreateDrivingTrainingRecordDto,
+  ): Promise<void> {
+    const { userId, vehicleId } = bodyParams;
+    const enrolledActive = await this.enrollmentRecordRepository
+      .createQueryBuilder('enrollment')
+      .leftJoinAndSelect('enrollment.enrolledUser', 'user')
+      .leftJoinAndSelect('enrollment.desiredLicense', 'license')
+      .leftJoinAndSelect(
+        'enrollment.drivingTrainingRecord',
+        'drivingTrainingRecord',
+      )
+      .where('user.id = :id', { id: userId })
+      .andWhere('enrollment.status = :status', { status: 'ACTIVE' })
       .getOne();
-    console.log('user', user);
+    if (!enrolledActive) throw new UserHasNoEnrollmentActive();
+
+    if (enrolledActive.drivingTrainingRecord)
+      throw new TrainingRecordAlreadyExists();
+
+    const vehicle = await this.vehiclesRepository
+      .createQueryBuilder('vehicle')
+      .where('vehicle.id = :id', { id: vehicleId })
+      .getOne();
+
+    if (!vehicle) throw new VehicleNotFound();
+    vehicle.status = 'INACTIVE';
+    await this.vehiclesRepository.save(vehicle);
+    const queryTrainingRecord = this.drivingTrainingRecordRepository.create({
+      id: randomUUID(),
+      enrollmentRecord: enrolledActive,
+      vehicle,
+    });
+
+    const trainingRecord =
+      await this.drivingTrainingRecordRepository.save(queryTrainingRecord);
+
+    await this.enrollmentRecordRepository.save({
+      id: enrolledActive.id,
+      drivingTrainingRecord: trainingRecord,
+    });
+  }
+
+  async createDrivingTrainingDailyLog(
+    bodyParams: CreateDrivingTrainingDailyRecordDto,
+  ): Promise<any> {
+    const { userId, ...rest } = bodyParams;
+    const trainingRecord = await this.drivingTrainingRecordRepository
+      .createQueryBuilder('drivingTrainingRecord')
+      .leftJoinAndSelect('drivingTrainingRecord.enrollmentRecord', 'enrollment')
+      .leftJoinAndSelect('drivingTrainingRecord.vehicle', 'vehicle')
+      .leftJoinAndSelect('enrollment.desiredLicense', 'license')
+      .leftJoinAndSelect('license.courses', 'courses')
+      .leftJoinAndSelect('enrollment.enrolledUser', 'user')
+      .leftJoinAndSelect('drivingTrainingRecord.dailyLogs', 'dailyLogs')
+      .where('user.id = :id', { id: userId })
+      .andWhere('enrollment.status = :status', { status: 'ACTIVE' })
+      .getOne();
+
+    console.log('bodyParams', bodyParams);
+    if (!trainingRecord) throw new UserHasNoEnrollmentActive();
+
+    const allCourses = trainingRecord.enrollmentRecord.desiredLicense.courses
+      .filter((c) => c.type === 'PRACTICE')
+      .sort((a, b) => a.position - b.position);
+
+    console.log('allCourses', allCourses);
+
+    const dailyLogsCount = trainingRecord.dailyLogs?.length ?? 0;
+
+    const nextCourse = allCourses[dailyLogsCount];
+
+    if (!nextCourse) throw new NoCoursesAvailable();
+
+    const mileageStart = trainingRecord.vehicle.mileage;
+
+    const randomMileage = Math.floor(Math.random() * (70 - 60) + 60);
+
+    const mileageEnd = Number(trainingRecord.vehicle.mileage) + randomMileage;
+    const dailyLog = this.drivingTrainingDailyLogRepository.create({
+      id: randomUUID(),
+      initDate: bodyParams.initDate,
+      endDate: bodyParams.endDate,
+      drivingTrainingRecord: trainingRecord,
+      course: nextCourse,
+      instructor: bodyParams.instructor,
+      mileageStart: mileageStart,
+      mileageEnd: mileageEnd.toString(),
+    });
+
+    const mileageVehicle = await this.vehiclesRepository.findOne({
+      where: { id: trainingRecord.vehicle.id },
+    });
+
+    if (!mileageVehicle) throw new VehicleNotFound();
+
+    mileageVehicle.mileage = mileageEnd.toString();
+
+    await this.vehiclesRepository.save(mileageVehicle);
+    await this.drivingTrainingDailyLogRepository.save(dailyLog);
+
+    return trainingRecord;
   }
 
   async findDrivingTrainingRecordByParticipant(
@@ -62,30 +169,15 @@ export class DrivingManagementService {
         'drivingTrainingRecord',
       )
       .leftJoinAndSelect('enrollment.desiredLicense', 'license')
-      .leftJoinAndSelect('drivingTrainingRecords.vehicle', 'vehicle')
-      .leftJoinAndSelect('drivingTrainingRecords.dailyLogs', 'dailyLogs')
+      .leftJoinAndSelect('drivingTrainingRecord.vehicle', 'vehicle')
+      .leftJoinAndSelect('drivingTrainingRecord.dailyLogs', 'dailyLogs')
       .where('user.id = :id', { id: participantId })
       .andWhere('enrollment.status = :status', { status: 'ACTIVE' })
       .getOne();
 
     if (!enrollmentRecord) throw new UserHasNoEnrollmentActive();
 
-    return {
-      id: enrollmentRecord.id,
-      procedureType: enrollmentRecord.procedureType,
-      issueDate: enrollmentRecord.issueDate,
-      enrolledUser: {
-        id: enrollmentRecord.enrolledUser.id,
-        email: enrollmentRecord.enrolledUser.email,
-        firstName: enrollmentRecord.enrolledUser.firstName,
-        lastName: enrollmentRecord.enrolledUser.lastName,
-        commonName: enrollmentRecord.enrolledUser.commonName,
-        documentIdentifier: enrollmentRecord.enrolledUser.documentIdentifier,
-        phoneNumber: enrollmentRecord.enrolledUser.phoneNumber,
-        __entity: 'UserEntity',
-      },
-      drivingTrainingRecords: enrollmentRecord.drivingTrainingRecord,
-    };
+    return enrollmentRecord;
   }
   async createDrivingTeoricRecord(
     bodyParams: CreateDrivingTeoricRecordDto,
@@ -232,5 +324,31 @@ export class DrivingManagementService {
     const courses = await this.coursesRepository.find();
     console.log('courses', courses);
     return courses;
+  }
+
+  async createVehicle(vehicle: CreateVehicleDto): Promise<any> {
+    const licenceCategory = await this.licenseCategoryRepository.findOne({
+      where: {
+        id: vehicle.licenceCategoryId,
+      },
+    });
+
+    if (!licenceCategory) throw new LicenceNotFound();
+
+    const { licenceCategoryId, ...rest } = vehicle;
+    return await this.vehiclesRepository.save({
+      id: randomUUID(),
+      licenceCategory,
+      ...rest,
+    });
+  }
+
+  async findVehicles(): Promise<any> {
+    const vehicles = await this.licenseCategoryRepository
+      .createQueryBuilder('license')
+      .leftJoinAndSelect('license.vehicles', 'vehicle')
+      .getMany();
+    console.log('vehicles', vehicles);
+    return vehicles;
   }
 }
