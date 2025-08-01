@@ -56,6 +56,12 @@ export const routesV1 = {
     createVehicle: `/${driving}/create-vehicle`,
     findVehicles: `/${driving}/find-vehicles`,
     generateDrivingTrainingDailyRecord: `/${driving}/create-driving-training-daily-record`,
+    evaluation: {
+      driving: `/${driving}/evaluation/driving`,
+      drivingResult: `/${driving}/evaluation/driving-result`,
+      teoric: `/${driving}/evaluation/teoric`,
+      teoricResult: `/${driving}/evaluation/teoric-result`,
+    },
   },
 
   enrollmentManagement: {

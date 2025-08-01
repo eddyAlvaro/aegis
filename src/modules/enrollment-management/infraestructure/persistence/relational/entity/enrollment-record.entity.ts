@@ -11,6 +11,8 @@ import { DrivingTeoricRecordEntity } from '../../../../../driving-management/inf
 import { DrivingTrainingRecordEntity } from '../../../../../driving-management/infraestructure/persistence/relational/entity/practice-register/driving-training-record.entity';
 import { UserEntity } from '../../../../../users-management/infraestructure/persistence/relational/entity/user.entity';
 import { LicenseCategoryEntity } from '../../../../../driving-management/infraestructure/persistence/relational/entity/training/license-category.entity';
+import { DrivingEvalutationEntity } from '../../../../../driving-management/infraestructure/persistence/relational/entity/practice-register/evaluation/driving-evaluation.entity';
+import { TeoricEvalutationEntity } from '../../../../../driving-management/infraestructure/persistence/relational/entity/practice-register/evaluation/teoric-evaluation.entity';
 
 @Entity()
 export class EnrollmentRecordEntity {
@@ -71,4 +73,15 @@ export class EnrollmentRecordEntity {
 
   @Column({ type: 'varchar', length: 50, nullable: true })
   certificateNumber: string;
+
+  @OneToOne(
+    () => DrivingEvalutationEntity,
+    (driving) => driving.enrollmentRecord,
+  )
+  @JoinColumn()
+  drivingEvaluation: DrivingEvalutationEntity;
+
+  @OneToOne(() => TeoricEvalutationEntity, (teoric) => teoric.enrollmentRecord)
+  @JoinColumn()
+  teoricEvaluation: TeoricEvalutationEntity;
 }

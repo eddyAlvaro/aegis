@@ -10,12 +10,17 @@ import { UsersManagementModule } from '../users-management/users-management.modu
 import { RelationalUserPersistenceModule } from '../users-management/infraestructure/persistence/relational/relational-persistence.module';
 import { SharedKernelManagementModule } from '../shared-kernel/shared-kernel.module';
 import { CredentialsManagementModule } from '../creadentials-management/credentials-management.module';
+import { EvaluationManagementHttpController } from './presentation/evaluation-management.http-controller';
+import { EvaluationManagementService } from './application/services/evaluation-management.service';
 
-const httpControllers = [DrivingManagementHttpController];
+const httpControllers = [
+  DrivingManagementHttpController,
+  EvaluationManagementHttpController,
+];
 
 const commandHandlers: Provider[] = [];
 const queryHandlers: Provider[] = [];
-const services = [DrivingManagementService];
+const services = [DrivingManagementService, EvaluationManagementService];
 
 @Module({
   imports: [
