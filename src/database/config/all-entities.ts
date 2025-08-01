@@ -9,6 +9,8 @@ import { CoursesEntity } from '../../modules/driving-management/infraestructure/
 import { LicenseCategoryEntity } from '../../modules/driving-management/infraestructure/persistence/relational/entity/training/license-category.entity';
 import { PasswordResetTokenEntity } from '../../modules/creadentials-management/infraestructure/persistence/relational/password-reset-token.entity';
 import { VehiclesEntity } from '../../modules/driving-management/infraestructure/persistence/relational/entity/training/vehicles.entity';
+import { DrivingEvalutationEntity } from '../../modules/driving-management/infraestructure/persistence/relational/entity/practice-register/evaluation/driving-evaluation.entity';
+import { TeoricEvalutationEntity } from '../../modules/driving-management/infraestructure/persistence/relational/entity/practice-register/evaluation/teoric-evaluation.entity';
 
 export const allEntities = [
   AuditableEventEntity,
@@ -22,4 +24,6 @@ export const allEntities = [
   LicenseCategoryEntity,
   PasswordResetTokenEntity,
   VehiclesEntity,
+  DrivingEvalutationEntity,
+  TeoricEvalutationEntity,
 ];
