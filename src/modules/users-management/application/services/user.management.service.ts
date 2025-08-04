@@ -72,6 +72,18 @@ export class UserManagementService {
   }
   async viewPaginatedUsers(query: PaginatedQueryRequestDto): Promise<any> {
     const queryBuilder = this.buildQueryBuilder(query);
+    queryBuilder
+      .leftJoinAndSelect('user.enrollmentRecords', 'enrollmentRecords')
+      .leftJoinAndSelect(
+        'enrollmentRecords.drivingTrainingRecord',
+        'drivingTrainingRecord',
+      )
+      .leftJoinAndSelect(
+        'enrollmentRecords.drivingTeoricRecords',
+        'drivingTeoricRecords',
+      )
+      .leftJoinAndSelect('enrollmentRecords.desiredLicense', 'license')
+      .leftJoinAndSelect('license.courses', 'courses');
     queryBuilder.andWhere('user.type = :type', { type: UserType.Participant });
     queryBuilder.skip((query.page - 1) * query.limit).take(query.limit);
 
